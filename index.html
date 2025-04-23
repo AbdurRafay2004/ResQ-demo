@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResQ - Emergency Response Without Limits</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="flex justify-between items-center py-4 px-6 bg-white shadow">
+        <div class="flex items-center">
+            <a href="index.html" class="flex items-center space-x-2">
+                <div class="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm">RQ</div>
+                <span class="text-xl font-semibold text-gray-800">ResQ</span>
+            </a>
+            
+        </div>
+        <div class="flex items-center space-x-6">
+            <!-- <a href="map-demo.html" class="text-gray-700 hover:text-red-600">Demo</a> -->
+            <a href="#features-section" class="text-gray-700 hover:text-red-600">Features</a>
+            <!-- <a href="map-demo.html" class="text-gray-700 hover:text-red-600">How It Works</a> -->
+            <a href="emergency.html" class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700">Try Demo</a>
+        </div>
+    </nav>
+
+    <!-- Landing Page -->
+    <section class="py-20 px-6 flex flex-col md:flex-row items-center justify-between max-w-6xl mx-auto">
+        <div class="md:w-1/2">
+            <p class="text-red-600 text-sm mb-2">Emergency Response Reimagined</p>
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                Emergency Apps Fail Without Signal… <span class="text-red-600">ResQ</span> Doesn’t
+            </h1>
+            <p class="text-lg text-gray-600 mb-6">
+                A revolutionary dual-mode emergency response system that works even when cellular and internet connections don’t, using mesh networking to save lives.
+            </p>
+            <div class="flex space-x-4">
+                <a href="map-demo.html" class="bg-red-600 text-white py-3 px-6 rounded hover:bg-red-700">See How The Map Works</a>
+                <a href="emergency.html" class="border border-red-600 text-red-600 py-3 px-6 rounded hover:bg-red-50">Try Emergency Activation</a>
+            </div>
+        </div>
+        <div class="md:w-1/3 mt-6 md:mt-0">
+            <div class="bg-gray-100 p-6 rounded-lg shadow text-center">
+                <div class="flex justify-around mb-4">
+                    <div>
+                        <span class="text-2xl">📶</span>
+                        <p class="text-sm mt-2">Online</p>
+                    </div>
+                    <div>
+                        <span class="text-2xl">🚫</span>
+                        <p class="text-sm mt-2">Offline</p>
+                    </div>
+                </div>
+                <p class="font-bold">Works in Both Modes</p>
+                <div class="mt-4 flex justify-center space-x-2">
+                    <div class="w-4 h-4 bg-red-200 rounded-full flex items-center justify-center">
+                        <span class="w-2 h-2 bg-red-600 rounded-full indicator-dot-red"></span>
+                    </div>
+                    <p class="text-sm">Emergency Alert</p>
+                </div>
+                <div class="mt-2 flex justify-center space-x-2">
+                    <div class="w-4 h-4 bg-blue-200 rounded-full flex items-center justify-center">
+                        <span class="w-2 h-2 bg-blue-600 rounded-full indicator-dot-blue"></span>
+                    </div>
+                    <p class="text-sm">Location Sharing</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Page -->
+    <section id="features-section" class="bg-gray-100 py-10">
+        <h2 class="text-3xl font-bold text-center mb-6">Key Features</h2>
+        <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
+            <div>
+                <h3 class="font-bold">Dual-Mode Operation</h3>
+                <p>ResQ works seamlessly online and offline, ensuring connectivity in any situation.</p>
+            </div>
+            <div>
+                <h3 class="font-bold">Decentralized Networking</h3>
+                <p>Uses Bluetooth/Wi-Fi Direct for peer-to-peer communication when offline.</p>
+            </div>
+            <div>
+                <h3 class="font-bold">Location Sharing</h3>
+                <p>Securely share your location with rescuers, even without internet.</p>
+            </div>
+            <div>
+                <h3 class="font-bold">Crime Analytics</h3>
+                <p>Visualize crime hotspots to stay informed and safe.</p>
+            </div>
+            <div>
+                <h3 class="font-bold">Privacy Focus</h3>
+                <p>Your data is encrypted and only shared with authorized rescuers.</p>
+            </div>
+        </div>
+    </section>
+
+    <script src="script.js"></script>
+</body>
+</html>
