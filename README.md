@@ -1,6 +1,6 @@
 # ResQ - demo design
 
-Visit out site - https://github.com/AbdurRafay2004/ResQ-demo/
+Visit out site - [ResQ - Demo design](https://abdurrafay2004.github.io/ResQ-demo/)
 
 ## Features
 
