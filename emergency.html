@@ -116,19 +116,19 @@
     <script>
         const button = document.getElementById("activate-emergency");
         let holdTimeout;
-
-        button.addEventListener("mousedown", () => {
+    
+        // Function to start the hold action (shared for mouse and touch)
+        const startHold = () => {
             // Start pulsing animation
             button.classList.add("pulsing");
-
-            // Hold for 1 seconds to activate
+    
+            // Hold for 1 second to activate
             holdTimeout = setTimeout(() => {
-                //Request geolocation
+                // Request geolocation
                 navigator.geolocation.getCurrentPosition(
                     position => {
                         const { latitude, longitude } = position.coords;
                         window.location.href = `map-demo.html?lat=${latitude}&lng=${longitude}`;
-
                     },
                     error => {
                         console.error("Geolocation error:", error.message);
@@ -143,15 +143,26 @@
                     }
                 );
             }, 1000);
-        });
-
+        };
+    
+        // Function to stop the hold action (shared for mouse and touch)
         const stopHold = () => {
             clearTimeout(holdTimeout);
             button.classList.remove("pulsing");
         };
-
+    
+        // Mouse event listeners (for desktop)
+        button.addEventListener("mousedown", startHold);
         button.addEventListener("mouseup", stopHold);
         button.addEventListener("mouseleave", stopHold);
+    
+        // Touch event listeners (for mobile)
+        button.addEventListener("touchstart", (e) => {
+            e.preventDefault(); // Prevent default touch behaviors (e.g., scrolling)
+            startHold();
+        });
+        button.addEventListener("touchend", stopHold);
+        button.addEventListener("touchcancel", stopHold);
     </script>
 
 
