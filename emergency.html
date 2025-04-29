@@ -109,7 +109,7 @@
     <div class="emergency-container">
         <a href="index.html" class="back-link">← Back to Home</a>
         <h2>Emergency Activation</h2>
-        <p class="description">Press and hold the button for 3 seconds to activate</p>
+        <p class="description">Press and hold the button for 1 seconds to activate</p>
         <button id="activate-emergency" class="hold-button">HOLD</button>
         <p class="message">This will send your location to emergency services and nearby ResQ users</p>
     </div>
@@ -121,14 +121,28 @@
             // Start pulsing animation
             button.classList.add("pulsing");
 
-            // Hold for 3 seconds to activate
+            // Hold for 1 seconds to activate
             holdTimeout = setTimeout(() => {
-                // Optional: Show alert before redirect (you can remove this)
-                // alert("Emergency Activated!");
+                //Request geolocation
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        const { latitude, longitude } = position.coords;
+                        window.location.href = `map-demo.html?lat=${latitude}&lng=${longitude}`;
 
-                // Redirect to the map demo page
-                window.location.href = "map-demo.html";
-            }, 3000);
+                    },
+                    error => {
+                        console.error("Geolocation error:", error.message);
+                        // Fallback to default location (London) with error message
+                        alert("Unable to get location: " + error.message + ". Using default location.");
+                        window.location.href = "map-demo.html?lat=51.505&lng=-0.09";
+                    },
+                    {
+                        enableHighAccuracy: true, // Prioritize accuracy
+                        timeout: 5000, // Wait up to 5 seconds
+                        maximumAge: 0 // No cached position
+                    }
+                );
+            }, 1000);
         });
 
         const stopHold = () => {
