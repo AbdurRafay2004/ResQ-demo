@@ -7,10 +7,6 @@ nav {
     border-bottom: none;
 }
 
-.container {
-    touch-action: auto; /* Ensure parent doesn’t block touch events */
-}
-
 .map-container {
     max-width: 1500px;
     max-height: 600px;
@@ -18,26 +14,21 @@ nav {
     border-radius: 8px;
     overflow: hidden;
     position: relative;
-    touch-action: manipulation;
+    touch-action: manipulation; /* Fallback for Safari, allows pinch-zoom and two-finger panning */
 }
 
 #map {
     width: 100%;
     height: 100%;
-    touch-action: manipulation;
+    touch-action: manipulation; /* Consistent with container */
 }
 
+/* Ensure elements don’t overlap the map unnecessarily */
 #offline-message, #touch-hint {
-    z-index: 1000;
+    z-index: 1000; /* Ensure above map */
 }
 
-#touch-hint {
-    font-size: 0.9rem;
-    line-height: 1.5;
-    max-width: 90%;
-    margin: 0 auto;
-}
-
+/* Pulsing animation for indicators */
 @keyframes pulse-ring {
     0% {
         box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
@@ -50,13 +41,7 @@ nav {
     }
 }
 
+/* Apply the animation to the red indicator dots */
 .indicator-dot {
     animation: pulse-ring 2s infinite;
-}
-
-/* Hide touch hint on desktop */
-@media (min-width: 768px) {
-    #touch-hint {
-        display: none;
-    }
 }
