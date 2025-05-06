@@ -117,62 +117,78 @@
         const button = document.getElementById("activate-emergency");
         let holdTimeout;
 
-        // Function to start the hold action (shared for mouse and touch)
-        const startHold = () => {
-            // Start pulsing animation
-            button.classList.add("pulsing");
-
-            // Hold for 1 second to activate
-            holdTimeout = setTimeout(() => {
-                // Request geolocation
+        // Retry geolocation up to 3 times
+        function attemptGeolocation(attempts = 3, interval = 2000) {
+            let tries = 0;
+            function tryGeolocation(resolve, reject) {
                 navigator.geolocation.getCurrentPosition(
-                    position => {
-                        const { latitude, longitude } = position.coords;
-                        // Save location to localStorage
-                        localStorage.setItem('lastKnownLocation', JSON.stringify({ lat: latitude, lng: longitude }));
-                        window.location.href = `map-demo.html?lat=${latitude}&lng=${longitude}`;
-                    },
+                    position => resolve(position),
                     error => {
-                        console.error("Geolocation error:", error.message);
-                        const lastKnown = JSON.parse(localStorage.getItem('lastKnownLocation'));
-                        let message = "Unable to get location: " + error.message + ".";
-                        if (error.code === error.PERMISSION_DENIED) {
-                            message += " Please enable location permissions.";
-                        } else if (error.code === error.POSITION_UNAVAILABLE) {
-                            message += " Try moving to an open area.";
-                        }
-                        if (lastKnown && lastKnown.lat && lastKnown.lng) {
-                            message += " Using last known location.";
-                            window.location.href = `map-demo.html?lat=${lastKnown.lat}&lng=${lastKnown.lng}`;
+                        tries++;
+                        if (tries < attempts) {
+                            setTimeout(() => tryGeolocation(resolve, reject), interval);
                         } else {
-                            message += " Using default location (Dhaka).";
-                            window.location.href = "map-demo.html?lat=23.7104&lng=90.4074";
+                            reject(error);
                         }
-                        alert(message);
                     },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 5000,
-                        maximumAge: 0
-                    }
+                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
+            }
+            return new Promise((resolve, reject) => tryGeolocation(resolve, reject));
+        }
+
+        const startHold = () => {
+            button.classList.add("pulsing");
+            holdTimeout = setTimeout(() => {
+                // Check permission state
+                navigator.permissions.query({ name: 'geolocation' }).then(permissionStatus => {
+                    if (permissionStatus.state === 'denied') {
+                        alert("Location access is denied. Please enable location permissions in your browser settings and try again.");
+                        button.classList.remove("pulsing");
+                        return;
+                    }
+                    attemptGeolocation().then(
+                        position => {
+                            const { latitude, longitude } = position.coords;
+                            localStorage.setItem('lastKnownLocation', JSON.stringify({ lat: latitude, lng: longitude }));
+                            window.location.href = `map-demo.html?lat=${latitude}&lng=${longitude}`;
+                        },
+                        error => {
+                            console.error("Geolocation error:", error.message);
+                            let message = "Unable to get location: " + error.message + ".";
+                            if (error.code === error.PERMISSION_DENIED) {
+                                message = "Location permission denied. Please enable location access in your browser settings.";
+                            } else if (error.code === error.POSITION_UNAVAILABLE) {
+                                message = "Location unavailable. Try moving to an open area or enabling GPS.";
+                            } else if (error.code === error.TIMEOUT) {
+                                message = "Location request timed out. Please try again.";
+                            }
+                            const lastKnown = JSON.parse(localStorage.getItem('lastKnownLocation'));
+                            if (lastKnown && lastKnown.lat && lastKnown.lng) {
+                                message += " Using last known location.";
+                                window.location.href = `map-demo.html?lat=${lastKnown.lat}&lng=${lastKnown.lng}`;
+                            } else {
+                                message += " Using default location (Dhaka).";
+                                window.location.href = "map-demo.html?lat=23.7104&lng=90.4074";
+                            }
+                            alert(message);
+                            button.classList.remove("pulsing");
+                        }
+                    );
+                });
             }, 1000);
         };
 
-        // Function to stop the hold action (shared for mouse and touch)
         const stopHold = () => {
             clearTimeout(holdTimeout);
             button.classList.remove("pulsing");
         };
 
-        // Mouse event listeners (for desktop)
         button.addEventListener("mousedown", startHold);
         button.addEventListener("mouseup", stopHold);
         button.addEventListener("mouseleave", stopHold);
-
-        // Touch event listeners (for mobile)
         button.addEventListener("touchstart", (e) => {
-            e.preventDefault(); // Prevent default touch behaviors (e.g., scrolling)
+            e.preventDefault();
             startHold();
         });
         button.addEventListener("touchend", stopHold);
