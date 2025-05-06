@@ -23,25 +23,24 @@
     <!-- Map Section -->
     <div class="container mx-auto mt-6 px-6">
         <section class="py-4 px-6 bg-white rounded-lg shadow relative">
-            <!-- Toggle Button -->
             <button id="mode-toggle"
                 class="absolute top-2 right-6 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 flex items-center z-10">
                 <span id="mode-icon">📶</span>
                 <span id="mode-text" class="ml-2">Online Mode</span>
             </button>
-
-            <p class="text-left text-gray-600 mb-4">Click anywhere on the map to place a distress signal</p>
+    
+            <p class="text-left text-gray-600 mb-4">Click or tap anywhere on the map to place a distress signal</p>
             <div class="map-container relative mx-auto">
-                <!-- Offline Mode Banner -->
                 <div id="offline-message"
                     class="absolute top-0 left-0 right-0 bg-gray-800 text-white text-center py-2 rounded hidden">
                     OFFLINE MODE: SEARCHING FOR NEARBY RESQ USERS VIA BLUETOOTH/WI-FI DIRECT
                 </div>
-
-                <!-- Map Container -->
+                <div id="touch-hint"
+                    class="absolute top-4 left-4 right-4 bg-black bg-opacity-50 text-white text-center py-2 rounded hidden">
+                    Use two fingers to move or zoom the map
+                </div>
                 <div id="map" style="height: 600px;"></div>
-
-                <!-- Indicators (Legend) -->
+    
                 <div class="absolute bottom-4 left-4 z-10 bg-white bg-opacity-90 rounded px-4 py-2 shadow flex space-x-6 items-center">
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 bg-red-200 rounded-full flex items-center justify-center">

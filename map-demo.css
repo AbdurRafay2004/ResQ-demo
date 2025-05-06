@@ -14,18 +14,18 @@ nav {
     border-radius: 8px;
     overflow: hidden;
     position: relative;
-    touch-action: pinch-zoom pan-x pan-y; /* Allow two-finger zoom and pan */
+    touch-action: manipulation; /* Fallback for Safari, allows pinch-zoom and two-finger panning */
 }
 
 #map {
     width: 100%;
     height: 100%;
-    touch-action: pinch-zoom pan-x pan-y; /* Ensure map element allows touch gestures */
+    touch-action: manipulation; /* Consistent with container */
 }
 
 /* Ensure elements don’t overlap the map unnecessarily */
-#offline-message {
-    z-index: 1000; /* Mapbox uses high z-index, so ensure banner is above */
+#offline-message, #touch-hint {
+    z-index: 1000; /* Ensure above map */
 }
 
 /* Pulsing animation for indicators */

@@ -6,62 +6,77 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let isOnline = true;
     let map;
-    const distressSignals = []; // Store distress signals
+    const distressSignals = [];
     const crimeHotspots = [
         { lat: 23.807610, lng: 90.369018 },
         { lat: 23.807895, lng: 90.373577 }
-    ]; // Sample crime hotspots
+    ];
 
-    // Replace with your Mapbox access token
-    mapboxgl.accessToken = 'pk.eyJ1IjoidGFoc2luMjAwNCIsImEiOiJjbTlyemV4dngxdXZzMmlzYTgxZ3Q3enFyIn0.9n4fWcTg66Oe7wIRp4Vd7g'; //your mapbox acces token
+    mapboxgl.accessToken = 'pk.eyJ1IjoidGFoc2luMjAwNCIsImEiOiJjbTlyemV4dngxdXZzMmlzYTgxZ3Q3enFyIn0.9n4fWcTg66Oe7wIRp4Vd7g';
 
-    // Parse query parameters from emergency activation
     const urlParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(urlParams.get('lat')) || 23.7104; // Default to Dhaka
+    const lat = parseFloat(urlParams.get('lat')) || 23.7104;
     const lng = parseFloat(urlParams.get('lng')) || 90.4074;
 
-    // Initialize Mapbox map
     function initMap() {
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
         map = new mapboxgl.Map({
             container: 'map',
-            style: isOnline ? 'mapbox://styles/mapbox/streets-v11' : '', // No style for offline
+            style: isOnline ? 'mapbox://styles/mapbox/streets-v11' : '',
             center: [lng, lat],
             zoom: 13,
             interactive: true,
-            dragPan: !isMobile, // Enable single-finger panning
+            dragPan: true, // Re-enable dragPan for all devices
             touchZoomRotate: true, // Enable pinch-zoom and rotation
-            //touchPitch: true // Optional: Enable two-finger pitch adjustment
+            touchPitch: true // Enable two-finger pitch adjustment
         });
 
-        // Add navigation controls (zoom and rotation)
-        map.addControl(new mapboxgl.NavigationControl());
+        // Customize touch behavior for mobile
+        if (isMobile) {
+            // Disable single-finger panning to allow page scrolling
+            map.dragPan.disable();
+            // Enable two-finger panning manually
+            map.on('touchstart', (e) => {
+                if (e.points.length === 2) {
+                    map.dragPan.enable();
+                }
+            });
+            map.on('touchend', () => {
+                map.dragPan.disable();
+            });
 
-        //center the map on the user’s current location using Mapbox’s geolocation control
+            // Show touch hint for single-finger touches
+            const touchHint = document.getElementById('touch-hint');
+            if (touchHint) {
+                map.on('touchstart', (e) => {
+                    if (e.points.length === 1) {
+                        touchHint.classList.remove('hidden');
+                        setTimeout(() => touchHint.classList.add('hidden'), 2000);
+                    }
+                });
+            }
+        }
+
+        map.addControl(new mapboxgl.NavigationControl());
         map.addControl(new mapboxgl.GeolocateControl({
             positionOptions: { enableHighAccuracy: true },
             trackUserLocation: true
         }));
 
-        // Add distress signal from emergency activation
         if (urlParams.get('lat') && urlParams.get('lng')) {
             addDistressSignal({ lngLat: { lng, lat } });
         }
 
-        // Add crime hotspots
         addCrimeHotspots();
 
-        // Handle map click to place distress signals
         map.on('click touchend', (e) => {
-            if (e.originalEvent.type === 'touchend' && e.originalEvent.touches.length > 1) return; // Ignore multi-finger touches
+            if (e.originalEvent.type === 'touchend' && e.originalEvent.touches.length > 1) return;
             addDistressSignal(e);
         });
 
-        // Load offline signals
         loadDistressSignals();
     }
 
-    // Add distress signal
     function addDistressSignal(e) {
         const { lng, lat } = e.lngLat;
         const marker = new mapboxgl.Marker({
@@ -73,7 +88,6 @@ document.addEventListener('DOMContentLoaded', () => {
         saveDistressSignal(lat, lng);
     }
 
-    // Add crime hotspots
     function addCrimeHotspots() {
         crimeHotspots.forEach(hotspot => {
             new mapboxgl.Marker({
@@ -85,14 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Save distress signal to localStorage
     function saveDistressSignal(lat, lng) {
         const signals = JSON.parse(localStorage.getItem('distressSignals') || '[]');
         signals.push({ lat, lng, timestamp: Date.now() });
         localStorage.setItem('distressSignals', JSON.stringify(signals));
     }
 
-    // Load distress signals from localStorage
     function loadDistressSignals() {
         const signals = JSON.parse(localStorage.getItem('distressSignals') || '[]');
         signals.forEach(signal => {
@@ -105,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Set initial state to online mode
     modeIcon.textContent = '📶';
     modeText.textContent = 'Online Mode';
     modeToggle.classList.remove('bg-red-600', 'hover:bg-red-700');
@@ -113,10 +124,8 @@ document.addEventListener('DOMContentLoaded', () => {
     offlineMessage.classList.add('hidden');
     initMap();
 
-    // Toggle between online and offline modes
     modeToggle.addEventListener('click', () => {
         isOnline = !isOnline;
-
         if (isOnline) {
             modeIcon.textContent = '📶';
             modeText.textContent = 'Online Mode';
@@ -130,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             modeToggle.classList.remove('bg-green-600', 'hover:bg-green-700');
             modeToggle.classList.add('bg-red-600', 'hover:bg-red-700');
             offlineMessage.classList.remove('hidden');
-            map.setStyle(''); // Remove style for offline
+            map.setStyle('');
         }
     });
 });
