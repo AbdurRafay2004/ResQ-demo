@@ -3,24 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ResQ Interactive Map Demo</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" />
-    <link rel="stylesheet" href="map-demo.css">
+    <title>ResQ - Map Demo</title>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.css" />
+    <link rel="stylesheet" href="map-demo.css" />
 </head>
-<body class="bg-gray-100">
-    <!-- Navigation Bar -->
-    <div class="container mx-auto mt-6 px-6">
-        <nav class="flex justify-between items-center py-4 px-6 bg-white rounded-lg shadow">
-            <div class="flex items-center">
-                <a href="index.html" class="text-gray-700 hover:text-red-600 text-sm">← Back to Home</a>
-            </div>
-            <div class="text-2xl font-bold text-center flex-1">ResQ Interactive Map Demo</div>
-            <div></div>
-        </nav>
-    </div>
-
-    <!-- Map Section -->
+<body>
     <div class="container mx-auto mt-6 px-6">
         <section class="py-4 px-6 bg-white rounded-lg shadow relative">
             <button id="mode-toggle"
@@ -28,19 +15,19 @@
                 <span id="mode-icon">📶</span>
                 <span id="mode-text" class="ml-2">Online Mode</span>
             </button>
-    
-            <p class="text-left text-gray-600 mb-4">Click or tap anywhere on the map to place a distress signal</p>
+
+            <p class="text-left text-gray-600 mb-4">Tap to place a distress signal or use two fingers to move/zoom the map</p>
             <div class="map-container relative mx-auto">
                 <div id="offline-message"
                     class="absolute top-0 left-0 right-0 bg-gray-800 text-white text-center py-2 rounded hidden">
                     OFFLINE MODE: SEARCHING FOR NEARBY RESQ USERS VIA BLUETOOTH/WI-FI DIRECT
                 </div>
                 <div id="touch-hint"
-                    class="absolute top-4 left-4 right-4 bg-black bg-opacity-50 text-white text-center py-2 rounded hidden">
+                    class="absolute top-4 left-4 right-4 bg-black bg-opacity-75 text-white text-center py-2 rounded hidden md:hidden">
                     Use two fingers to move or zoom the map
                 </div>
                 <div id="map" style="height: 600px;"></div>
-    
+
                 <div class="absolute bottom-4 left-4 z-10 bg-white bg-opacity-90 rounded px-4 py-2 shadow flex space-x-6 items-center">
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 bg-red-200 rounded-full flex items-center justify-center">
@@ -58,8 +45,7 @@
             </div>
         </section>
     </div>
-
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.0.0/mapbox-gl.js"></script>
     <script src="map-demo.js"></script>
 </body>
 </html>

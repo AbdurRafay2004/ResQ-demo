@@ -26,42 +26,32 @@ document.addEventListener('DOMContentLoaded', () => {
             center: [lng, lat],
             zoom: 13,
             interactive: true,
-            dragPan: true, // Re-enable dragPan for all devices
+            dragPan: true, // Enable panning for all devices
             touchZoomRotate: true, // Enable pinch-zoom and rotation
-            touchPitch: true // Enable two-finger pitch adjustment
+            touchPitch: true, // Enable two-finger pitch
+            cooperativeGestures: isMobile // Require two-finger gestures on mobile
         });
-
-        // Customize touch behavior for mobile
-        if (isMobile) {
-            // Disable single-finger panning to allow page scrolling
-            map.dragPan.disable();
-            // Enable two-finger panning manually
-            map.on('touchstart', (e) => {
-                if (e.points.length === 2) {
-                    map.dragPan.enable();
-                }
-            });
-            map.on('touchend', () => {
-                map.dragPan.disable();
-            });
-
-            // Show touch hint for single-finger touches
-            const touchHint = document.getElementById('touch-hint');
-            if (touchHint) {
-                map.on('touchstart', (e) => {
-                    if (e.points.length === 1) {
-                        touchHint.classList.remove('hidden');
-                        setTimeout(() => touchHint.classList.add('hidden'), 2000);
-                    }
-                });
-            }
-        }
 
         map.addControl(new mapboxgl.NavigationControl());
         map.addControl(new mapboxgl.GeolocateControl({
             positionOptions: { enableHighAccuracy: true },
             trackUserLocation: true
         }));
+
+        // Show touch hint on mobile until a valid gesture is detected
+        if (isMobile) {
+            const touchHint = document.getElementById('touch-hint');
+            if (touchHint) {
+                let gestureDetected = false;
+                touchHint.classList.remove('hidden');
+                map.on('touchstart', (e) => {
+                    if (e.points.length >= 2 && !gestureDetected) {
+                        gestureDetected = true;
+                        touchHint.classList.add('hidden');
+                    }
+                });
+            }
+        }
 
         if (urlParams.get('lat') && urlParams.get('lng')) {
             addDistressSignal({ lngLat: { lng, lat } });
