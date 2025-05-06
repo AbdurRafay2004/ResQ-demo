@@ -116,46 +116,60 @@
     <script>
         const button = document.getElementById("activate-emergency");
         let holdTimeout;
-    
+
         // Function to start the hold action (shared for mouse and touch)
         const startHold = () => {
             // Start pulsing animation
             button.classList.add("pulsing");
-    
+
             // Hold for 1 second to activate
             holdTimeout = setTimeout(() => {
                 // Request geolocation
                 navigator.geolocation.getCurrentPosition(
                     position => {
                         const { latitude, longitude } = position.coords;
+                        // Save location to localStorage
+                        localStorage.setItem('lastKnownLocation', JSON.stringify({ lat: latitude, lng: longitude }));
                         window.location.href = `map-demo.html?lat=${latitude}&lng=${longitude}`;
                     },
                     error => {
                         console.error("Geolocation error:", error.message);
-                        // Fallback to default location (London) with error message
-                        alert("Unable to get location: " + error.message + ". Using default location.");
-                        window.location.href = "map-demo.html?lat=51.505&lng=-0.09";
+                        const lastKnown = JSON.parse(localStorage.getItem('lastKnownLocation'));
+                        let message = "Unable to get location: " + error.message + ".";
+                        if (error.code === error.PERMISSION_DENIED) {
+                            message += " Please enable location permissions.";
+                        } else if (error.code === error.POSITION_UNAVAILABLE) {
+                            message += " Try moving to an open area.";
+                        }
+                        if (lastKnown && lastKnown.lat && lastKnown.lng) {
+                            message += " Using last known location.";
+                            window.location.href = `map-demo.html?lat=${lastKnown.lat}&lng=${lastKnown.lng}`;
+                        } else {
+                            message += " Using default location (Dhaka).";
+                            window.location.href = "map-demo.html?lat=23.7104&lng=90.4074";
+                        }
+                        alert(message);
                     },
                     {
-                        enableHighAccuracy: true, // Prioritize accuracy
-                        timeout: 5000, // Wait up to 5 seconds
-                        maximumAge: 0 // No cached position
+                        enableHighAccuracy: true,
+                        timeout: 5000,
+                        maximumAge: 0
                     }
                 );
             }, 1000);
         };
-    
+
         // Function to stop the hold action (shared for mouse and touch)
         const stopHold = () => {
             clearTimeout(holdTimeout);
             button.classList.remove("pulsing");
         };
-    
+
         // Mouse event listeners (for desktop)
         button.addEventListener("mousedown", startHold);
         button.addEventListener("mouseup", stopHold);
         button.addEventListener("mouseleave", stopHold);
-    
+
         // Touch event listeners (for mobile)
         button.addEventListener("touchstart", (e) => {
             e.preventDefault(); // Prevent default touch behaviors (e.g., scrolling)
