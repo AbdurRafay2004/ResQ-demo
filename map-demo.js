@@ -17,22 +17,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Parse query parameters from emergency activation
     const urlParams = new URLSearchParams(window.location.search);
-    const lat = parseFloat(urlParams.get('lat')) || 23.7104    ; // Default to Dhaka
+    const lat = parseFloat(urlParams.get('lat')) || 23.7104; // Default to Dhaka
     const lng = parseFloat(urlParams.get('lng')) || 90.4074;
 
     // Initialize Mapbox map
     function initMap() {
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
         map = new mapboxgl.Map({
             container: 'map',
             style: isOnline ? 'mapbox://styles/mapbox/streets-v11' : '', // No style for offline
             center: [lng, lat],
             zoom: 13,
-            interactive: true
+            interactive: true,
+            dragPan: !isMobile, // Enable single-finger panning
+            touchZoomRotate: true, // Enable pinch-zoom and rotation
+            //touchPitch: true // Optional: Enable two-finger pitch adjustment
         });
 
         // Add navigation controls (zoom and rotation)
         map.addControl(new mapboxgl.NavigationControl());
-        
+
         //center the map on the user’s current location using Mapbox’s geolocation control
         map.addControl(new mapboxgl.GeolocateControl({
             positionOptions: { enableHighAccuracy: true },
@@ -48,7 +52,10 @@ document.addEventListener('DOMContentLoaded', () => {
         addCrimeHotspots();
 
         // Handle map click to place distress signals
-        //map.on('click', addDistressSignal);
+        map.on('click touchend', (e) => {
+            if (e.originalEvent.type === 'touchend' && e.originalEvent.touches.length > 1) return; // Ignore multi-finger touches
+            addDistressSignal(e);
+        });
 
         // Load offline signals
         loadDistressSignals();
