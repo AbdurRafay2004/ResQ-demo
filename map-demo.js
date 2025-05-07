@@ -76,6 +76,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadDistressSignals();
     }
+    // Listen for emergency broadcasts
+    const channel = supabase.channel('emergency-alerts');
+    channel
+        .on('broadcast', { event: 'emergency' }, payload => {
+            const { user_id, latitude, longitude, timestamp } = payload.payload;
+            console.log(`Emergency alert from ${user_id} at ${latitude}, ${longitude} at ${timestamp}`);
+
+            // Add a distress signal to the map
+            const marker = new mapboxgl.Marker({ color: '#ff0000' })
+                .setLngLat([longitude, latitude])
+                .addTo(map);
+            distressSignals.push({ lng: longitude, lat: latitude, marker });
+
+            // Optionally, notify the user with a popup or alert
+            alert(`Emergency Alert: User ${user_id} needs help at ${latitude}, ${longitude}!`);
+        })
+        .subscribe();
+
     document.getElementById('clear-locations').addEventListener('click', () => {
         localStorage.removeItem('distressSignals');
         localStorage.removeItem('lastKnownLocation');

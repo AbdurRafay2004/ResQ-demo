@@ -140,7 +140,6 @@
         const startHold = () => {
             button.classList.add("pulsing");
             holdTimeout = setTimeout(() => {
-                // Check permission state
                 navigator.permissions.query({ name: 'geolocation' }).then(permissionStatus => {
                     if (permissionStatus.state === 'denied') {
                         alert("Location access is denied. Please enable location permissions in your browser settings and try again.");
@@ -148,9 +147,35 @@
                         return;
                     }
                     attemptGeolocation().then(
-                        position => {
+                        async position => {
                             const { latitude, longitude } = position.coords;
                             localStorage.setItem('lastKnownLocation', JSON.stringify({ lat: latitude, lng: longitude }));
+
+                            // Save the emergency to Supabase
+                            const userId = 'user_' + Math.random().toString(36).substr(2, 9); // Replace with actual user ID if you have authentication
+                            const { error: insertError } = await supabase
+                                .from('emergencies')
+                                .insert([{ user_id: userId, latitude, longitude }]);
+
+                            if (insertError) {
+                                console.error('Error saving emergency:', insertError.message);
+                                alert('Failed to save emergency. Using last known or default location.');
+                                const lastKnown = JSON.parse(localStorage.getItem('lastKnownLocation'));
+                                window.location.href = lastKnown && lastKnown.lat && lastKnown.lng
+                                    ? `map-demo.html?lat=${lastKnown.lat}&lng=${lastKnown.lng}`
+                                    : "map-demo.html?lat=23.7104&lng=90.4074";
+                                return;
+                            }
+
+                            // Broadcast the emergency to all users
+                            const channel = supabase.channel('emergency-alerts');
+                            await channel.send({
+                                type: 'broadcast',
+                                event: 'emergency',
+                                payload: { user_id: userId, latitude, longitude, timestamp: new Date().toISOString() }
+                            });
+
+                            // Redirect to map with the new coordinates
                             window.location.href = `map-demo.html?lat=${latitude}&lng=${longitude}`;
                         },
                         error => {
@@ -194,8 +219,8 @@
         button.addEventListener("touchend", stopHold);
         button.addEventListener("touchcancel", stopHold);
     </script>
-
-
+    <script src="supabase.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </body>
 
 </html>
