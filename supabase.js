@@ -1,3 +1,5 @@
 const SUPABASE_URL = 'https://cldqvnrdwrkauvufvrua.supabase.co'; // Replace with your Supabase URL
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNsZHF2bnJkd3JrYXV2dWZ2cnVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY2MDI0NDMsImV4cCI6MjA2MjE3ODQ0M30.AtxeMw2u1woYDvOxddr4CzZprapg6J5HxydJzyddmlo'; // Replace with your anon key
 const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+console.log('Supabase client initialized:', supabase);

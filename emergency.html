@@ -113,10 +113,12 @@
         <button id="activate-emergency" class="hold-button">HOLD</button>
         <p class="message">This will send your location to emergency services and nearby ResQ users</p>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="supabase.js"></script>
     <script>
         const button = document.getElementById("activate-emergency");
         let holdTimeout;
-
+    
         // Retry geolocation up to 3 times
         function attemptGeolocation(attempts = 3, interval = 2000) {
             let tries = 0;
@@ -136,7 +138,7 @@
             }
             return new Promise((resolve, reject) => tryGeolocation(resolve, reject));
         }
-
+    
         const startHold = () => {
             button.classList.add("pulsing");
             holdTimeout = setTimeout(() => {
@@ -150,31 +152,31 @@
                         async position => {
                             const { latitude, longitude } = position.coords;
                             localStorage.setItem('lastKnownLocation', JSON.stringify({ lat: latitude, lng: longitude }));
-
+    
                             // Save the emergency to Supabase
-                            const userId = 'user_' + Math.random().toString(36).substr(2, 9); // Replace with actual user ID if you have authentication
-                            const { error: insertError } = await supabase
-                                .from('emergencies')
-                                .insert([{ user_id: userId, latitude, longitude }]);
-
-                            if (insertError) {
-                                console.error('Error saving emergency:', insertError.message);
-                                alert('Failed to save emergency. Using last known or default location.');
-                                const lastKnown = JSON.parse(localStorage.getItem('lastKnownLocation'));
-                                window.location.href = lastKnown && lastKnown.lat && lastKnown.lng
-                                    ? `map-demo.html?lat=${lastKnown.lat}&lng=${lastKnown.lng}`
-                                    : "map-demo.html?lat=23.7104&lng=90.4074";
-                                return;
+                            try {
+                                const userId = 'user_' + Math.random().toString(36).substr(2, 9); // Replace with actual user ID if you have authentication
+                                const { error: insertError } = await supabase
+                                    .from('emergencies')
+                                    .insert([{ user_id: userId, latitude, longitude }]);
+    
+                                if (insertError) {
+                                    console.error('Error saving emergency:', insertError.message);
+                                    alert('Failed to save emergency to database. Proceeding with last known or default location.');
+                                } else {
+                                    // Broadcast the emergency to all users
+                                    const channel = supabase.channel('emergency-alerts');
+                                    await channel.send({
+                                        type: 'broadcast',
+                                        event: 'emergency',
+                                        payload: { user_id: userId, latitude, longitude, timestamp: new Date().toISOString() }
+                                    });
+                                }
+                            } catch (error) {
+                                console.error('Supabase error:', error.message);
+                                alert('Error connecting to Supabase. Proceeding with location sharing.');
                             }
-
-                            // Broadcast the emergency to all users
-                            const channel = supabase.channel('emergency-alerts');
-                            await channel.send({
-                                type: 'broadcast',
-                                event: 'emergency',
-                                payload: { user_id: userId, latitude, longitude, timestamp: new Date().toISOString() }
-                            });
-
+    
                             // Redirect to map with the new coordinates
                             window.location.href = `map-demo.html?lat=${latitude}&lng=${longitude}`;
                         },
@@ -203,12 +205,12 @@
                 });
             }, 1000);
         };
-
+    
         const stopHold = () => {
             clearTimeout(holdTimeout);
             button.classList.remove("pulsing");
         };
-
+    
         button.addEventListener("mousedown", startHold);
         button.addEventListener("mouseup", stopHold);
         button.addEventListener("mouseleave", stopHold);
@@ -219,8 +221,8 @@
         button.addEventListener("touchend", stopHold);
         button.addEventListener("touchcancel", stopHold);
     </script>
-    <script src="supabase.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    
+    
 </body>
 
 </html>
