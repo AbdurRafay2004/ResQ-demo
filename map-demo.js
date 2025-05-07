@@ -18,6 +18,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const lat = parseFloat(urlParams.get('lat')) || 23.7104;
     const lng = parseFloat(urlParams.get('lng')) || 90.4074;
 
+    // Move these functions above initMap
+    function addDistressSignal(e) {
+        const { lng, lat } = e.lngLat;
+        const marker = new mapboxgl.Marker({
+            color: '#ff0000'
+        })
+            .setLngLat([lng, lat])
+            .addTo(map);
+        distressSignals.push({ lng, lat, marker });
+        saveDistressSignal(lat, lng);
+    }
+
+    function addCrimeHotspots() {
+        crimeHotspots.forEach(hotspot => {
+            new mapboxgl.Marker({
+                color: '#ff0000',
+                scale: 0.8
+            })
+                .setLngLat([hotspot.lng, hotspot.lat])
+                .addTo(map);
+        });
+    }
+
+    function saveDistressSignal(lat, lng) {
+        const signals = JSON.parse(localStorage.getItem('distressSignals') || '[]');
+        signals.push({ lat, lng, timestamp: Date.now() });
+        localStorage.setItem('distressSignals', JSON.stringify(signals));
+    }
+
+    function loadDistressSignals() {
+        const signals = JSON.parse(localStorage.getItem('distressSignals') || '[]');
+        signals.forEach(signal => {
+            const marker = new mapboxgl.Marker({
+                color: '#ff0000'
+            })
+                .setLngLat([signal.lng, signal.lat])
+                .addTo(map);
+            distressSignals.push({ lng: signal.lng, lat: signal.lat, marker });
+        });
+    }
+
     function initMap() {
         const isMobile = /Mobi|Android/i.test(navigator.userAgent);
         map = new mapboxgl.Map({
@@ -101,8 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('No saved locations to clear.');
         }
     });
-
-    // Rest of your existing functions (addDistressSignal, addCrimeHotspots, etc.) remain unchanged
 
     modeIcon.textContent = '📶';
     modeText.textContent = 'Online Mode';
