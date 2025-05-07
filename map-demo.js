@@ -76,6 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadDistressSignals();
     }
+    document.getElementById('clear-locations').addEventListener('click', () => {
+        localStorage.removeItem('distressSignals');
+        localStorage.removeItem('lastKnownLocation');
+        distressSignals.forEach(signal => signal.marker.remove()); // Remove markers from map
+        distressSignals.length = 0; // Clear array
+        alert('All saved locations have been cleared.');
+    });
 
     function addDistressSignal(e) {
         const { lng, lat } = e.lngLat;

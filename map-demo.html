@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.css" />
     <link rel="stylesheet" href="map-demo.css">
 </head>
+
 <body class="bg-gray-100">
     <!-- Navigation Bar -->
     <div class="container mx-auto mt-6 px-6">
@@ -23,12 +25,20 @@
     <!-- Map Section -->
     <div class="container mx-auto mt-6 px-6">
         <section class="py-4 px-6 bg-white rounded-lg shadow relative">
-            <button id="mode-toggle"
-                class="absolute top-2 right-6 bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 flex items-center z-10">
-                <span id="mode-icon">📶</span>
-                <span id="mode-text" class="ml-2">Online Mode</span>
-            </button>
-    
+            <div class="absolute top-2 right-6 flex space-x-2 z-10">
+                <!-- Clear Location button -->
+                <button id="clear-locations"
+                    class="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 flex items-center">
+                    Clear Locations
+                </button>
+                <!-- Mode Toggle button -->
+                <button id="mode-toggle"
+                    class="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 flex items-center">
+                    <span id="mode-icon">📶</span>
+                    <span id="mode-text" class="ml-2">Online Mode Shao</span>
+                </button>
+            </div>
+
             <p class="text-left text-gray-600 mb-4">Click or tap anywhere on the map to place a distress signal</p>
             <div class="map-container relative mx-auto">
                 <div id="offline-message"
@@ -40,8 +50,9 @@
                     Use two fingers to move or zoom the map
                 </div>
                 <div id="map" style="height: 600px;"></div>
-    
-                <div class="absolute bottom-4 left-4 z-10 bg-white bg-opacity-90 rounded px-4 py-2 shadow flex space-x-6 items-center">
+
+                <div
+                    class="absolute bottom-4 left-4 z-10 bg-white bg-opacity-90 rounded px-4 py-2 shadow flex space-x-6 items-center">
                     <div class="flex items-center space-x-2">
                         <div class="w-4 h-4 bg-red-200 rounded-full flex items-center justify-center">
                             <span class="w-2 h-2 bg-red-600 rounded-full indicator-dot"></span>
@@ -62,4 +73,5 @@
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js"></script>
     <script src="map-demo.js"></script>
 </body>
+
 </html>
