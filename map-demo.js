@@ -110,23 +110,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ensure the map is loaded before setting up the listener
         map.on('load', () => {
-            // Listen for emergency broadcasts using window.mySupabase
+            // Listen for changes in the emergencies table
             if (!window.mySupabase) {
                 console.error('Supabase client not initialized. Check supabase.js.');
                 return;
             }
-            const channel = window.mySupabase.channel('emergency-alerts');
-            channel
-                .on('broadcast', { event: 'emergency' }, payload => {
-                    const { user_id, latitude, longitude, timestamp } = payload.payload;
-                    console.log(`Emergency alert from ${user_id} at ${latitude}, ${longitude} at ${timestamp}`);
-
+            const channel = window.mySupabase.channel('public:emergencies')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'emergencies'
+                }, payload => {
+                    const { user_id, latitude, longitude } = payload.new;
+                    console.log(`New emergency from ${user_id} at ${latitude}, ${longitude}`);
+        
                     // Add a distress signal to the map
                     const marker = new mapboxgl.Marker({ color: '#ff0000' })
                         .setLngLat([longitude, latitude])
                         .addTo(map);
                     distressSignals.push({ lng: longitude, lat: latitude, marker });
-
+        
                     // Notify the user with a popup or alert
                     alert(`Emergency Alert: User ${user_id} needs help at ${latitude}, ${longitude}!`);
                 })
