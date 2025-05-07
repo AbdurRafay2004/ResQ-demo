@@ -155,8 +155,8 @@
     
                             // Save the emergency to Supabase
                             try {
-                                const userId = 'user_' + Math.random().toString(36).substr(2, 9); // Replace with actual user ID if you have authentication
-                                const { error: insertError } = await supabase
+                                const userId = 'user_' + Math.random().toString(36).substr(2, 9);
+                                const { error: insertError } = await window.mySupabase
                                     .from('emergencies')
                                     .insert([{ user_id: userId, latitude, longitude }]);
     
@@ -165,7 +165,7 @@
                                     alert('Failed to save emergency to database. Proceeding with last known or default location.');
                                 } else {
                                     // Broadcast the emergency to all users
-                                    const channel = supabase.channel('emergency-alerts');
+                                    const channel = window.mySupabase.channel('emergency-alerts');
                                     await channel.send({
                                         type: 'broadcast',
                                         event: 'emergency',

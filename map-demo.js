@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const lat = parseFloat(urlParams.get('lat')) || 23.7104;
     const lng = parseFloat(urlParams.get('lng')) || 90.4074;
 
-    // Move these functions above initMap
     function addDistressSignal(e) {
         const { lng, lat } = e.lngLat;
         const marker = new mapboxgl.Marker({
@@ -111,8 +110,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ensure the map is loaded before setting up the listener
         map.on('load', () => {
-            // Listen for emergency broadcasts
-            const channel = supabase.channel('emergency-alerts');
+            // Listen for emergency broadcasts using window.mySupabase
+            if (!window.mySupabase) {
+                console.error('Supabase client not initialized. Check supabase.js.');
+                return;
+            }
+            const channel = window.mySupabase.channel('emergency-alerts');
             channel
                 .on('broadcast', { event: 'emergency' }, payload => {
                     const { user_id, latitude, longitude, timestamp } = payload.payload;
